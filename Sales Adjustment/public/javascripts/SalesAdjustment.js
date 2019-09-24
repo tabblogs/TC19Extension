@@ -1,9 +1,16 @@
-(function() {
+//(function() 
     //load tableau extension
-    tableau.extensions.initializeAsync().then(()=> {
-      const userName = getUserName();
-      console.log("userName: ",userName);
+
+let dashboardDataSources = {};
+var userName = "";
+
+tableau.extensions.initializeAsync().then(()=> {
       loadSelectedMarks("QuotaAttainment");
+
+      dashboardDataSources = listDataSources();
+      refreshDataSources(dashboardDataSources);
+
+      userName = getUserName();
   });
      
   // This variable will save off the function we can call to unregister listening to marks-selected events
@@ -16,7 +23,6 @@
     
     // Get the worksheet object from which we want to get the selected marks
     const worksheet = getSelectedSheet(worksheetName);
-    console.log(worksheet.name);
 
     // Set our title to an appropriate value
     $('#selected_marks_title').text(worksheet.name);
@@ -50,7 +56,7 @@
       // When the selection changes, reload the data
       loadSelectedMarks(worksheetName);
     });
-  }
+  };
 
   function populateDataTable (data, columns) {
     if(data.length > 0) {
@@ -69,12 +75,45 @@
       // If we didn't get any rows back, there must be no marks selected
       $('#no_data_message').css('display', 'inline');
     }
-  }
+
+  };
   
   function getSelectedSheet (worksheetName) {
     // Go through all the worksheets in the dashboard and find the one we want
     return tableau.extensions.dashboardContent.dashboard.worksheets.find((sheet)=> {
       return sheet.name === worksheetName;
     });
+  };
+
+  function listDataSources(){
+    let localdashboardDataSources = {};
+    let dataSourceFetchPromises = [];
+    const dashboard = tableau.extensions.dashboardContent.dashboard;
+
+    // Then loop through each worksheet and get its dataSources, save promise for later.
+    dashboard.worksheets.forEach(function (worksheet) {
+      dataSourceFetchPromises.push(worksheet.getDataSourcesAsync());
+    });
+
+    Promise.all(dataSourceFetchPromises).then(function (fetchResults) {
+      fetchResults.forEach(function (dataSourcesForWorksheet) {
+        dataSourcesForWorksheet.forEach(function (dataSource) {
+          if (!dashboardDataSources[dataSource.id]) { // We've already seen it, skip it.
+            dashboardDataSources[dataSource.id] = dataSource;
+          }
+        });
+      });
+
+    });
+    return localdashboardDataSources;
   }
-})();
+
+  function refreshDataSources(dashboardDataSources){
+    for (let dataSourceId in dashboardDataSources) {
+      const dataSource = dashboardDataSources[dataSourceId];
+      dataSource.refreshAsync().then(function () {
+        console.log(dataSource.name + ': Refreshed Successfully');
+      });
+    }
+  }
+//})();

@@ -1,13 +1,10 @@
 function postAdjustment(){
 
   let input = document.querySelectorAll(".form-control");
-  console.log("input: ",input)
-  console.log("inner text:", input[0].innerText)
-  console.log("value: ",input[0].lastElementChild.value)
 
   var postObject = {};
   var insertData = []; 
-  const name = "lclark"; //getUserName();
+  const name = userName;
 
   for(i=0;i<input.length;i++){
     const salesperson = input[i].innerText.trim();
@@ -19,13 +16,12 @@ function postAdjustment(){
   }
 
   postObject.data = insertData;
-  console.log("postObject: ",postObject);
   postData(JSON.stringify(postObject));
+  
+  refreshDataSources(dashboardDataSources);
 };
 
 postData = (insertData) => {
-  console.log("insertData: ",insertData);
-
   return new Promise( (resolve, reject) => {
   fetch("/postData", {
     method: "POST",
