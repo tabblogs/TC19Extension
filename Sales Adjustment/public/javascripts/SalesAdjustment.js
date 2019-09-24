@@ -1,7 +1,8 @@
 (function() {
     //load tableau extension
     tableau.extensions.initializeAsync().then(()=> {
-      getUserName();
+      const userName = getUserName();
+      console.log("userName: ",userName);
       loadSelectedMarks("QuotaAttainment");
   });
      
@@ -52,60 +53,28 @@
   }
 
   function populateDataTable (data, columns) {
-    // Do some UI setup here to change the visible section and reinitialize the table
-    $('#data_table_wrapper').empty();
+    if(data.length > 0) {
+      $('#no_data_message').css('display', 'none');  
 
-    if (data.length > 0) {
-      $('#no_data_message').css('display', 'none');
-      $('#data_table_wrapper').append(`<table id='data_table' >`);
-
-      console.log("popDataTable: ", data);
+      let form = document.getElementById("formPost");
       data.forEach(element => {
-        console.log("forEach", element)
-        $('#data_table_wrapper').append(`<div class="form-group row"> <div class="input-grup mb-3"> <div class="input-group-prepend">`);
-        $('#data_table_wrapper').append(element[0]);
-        $('#data_table_wrapper').append(`</div></div></div>`);
-        //$('#data_table_wrapper').append(`</td></tr>`);
-        
-      });
-      
-      $('#data_table_wrapper').append(`</table>`);
-
-      // // Do some math to compute the height we want the data table to be
-      // var top = $('#data_table_wrapper')[0].getBoundingClientRect().top;
-      // var height = $(document).height() - top - 130;
-
-      // // Initialize our data table with what we just gathered
-      // $('#data_table').DataTable({
-      //   data: data,
-      //   columns: columns,
-      //   autoWidth: true,
-      //   authHeight: true,
-      //   deferRender: true,
-      //   scroller: true,
-      //   scrollY: height,
-      //   scrollX: true,
-      //   dom: "<'row'<'col-sm-6'i><'col-sm-6'f>><'row'<'col-sm-12'tr>>" // Do some custom styling
-      //   //rowReorder: true
-      // });
+        form.innerHTML += `<div class="form-group row">
+                            <div class="form-control">
+                              <label>${element[0]}</label> 
+                              <input placeholder="adjustment"></input>
+                            </div>
+                          </div>`;
+      })
     } else {
       // If we didn't get any rows back, there must be no marks selected
       $('#no_data_message').css('display', 'inline');
     }
   }
-
+  
   function getSelectedSheet (worksheetName) {
     // Go through all the worksheets in the dashboard and find the one we want
     return tableau.extensions.dashboardContent.dashboard.worksheets.find((sheet)=> {
       return sheet.name === worksheetName;
     });
   }
-
-  function getUserName() {
-    usernamesheet = tableau.extensions.dashboardContent.dashboard.worksheets.find(w=>w.name==="currentUserSheet");
-    usernamesheet.getSummaryDataAsync().then( (data) => {
-      console.log("getUSerName columns: ",data.columns[0].data[0]);
-      console.log("getUSerName data: ",data);
-    });
-  };
 })();

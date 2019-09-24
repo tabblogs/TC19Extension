@@ -4,7 +4,6 @@ const sql = require('mssql');
 const credentials = require("./credentials.js");
 
 exports.insertData = (req, res)=>{  
-    let column = [];
     let values = [];
     
     let data = req.body.data;
@@ -18,10 +17,10 @@ exports.insertData = (req, res)=>{
             case "userName":
                 values += "('"+value+"',"
                 break;
-            case "stateName":
+            case "salesperson":
                 values += "'"+value+"',"
                 break;
-            case "stateRank":
+            case "adjustment":
                 values += "'"+value+"'),"
                 break;
         }
@@ -29,9 +28,8 @@ exports.insertData = (req, res)=>{
 
     valueArray = values.substr(0,values.length-1);
   
-    let insertQuery = `INSERT INTO ranking.dbo.states (userName,stateName,stateRank) VALUES ${valueArray};`;
+    let insertQuery = `INSERT INTO TC19Extensions.dbo.Adjustments (Adjuster,SalesPerson,DollarAdjustment) VALUES ${valueArray};`;
     console.log(insertQuery);
-    //INSERT INTO ranking.dbo.states (userName,stateName,stateRank) VALUES ('LC','Colorado','1'),('LC','Tennessee','2'),('LC','Texas','3');
   
     //send the insertQuery
     new sql.ConnectionPool(credentials.config)

@@ -1,47 +1,58 @@
-let stateList = [];
-
-postData = (insertData) => {
-  console.log("insertData: ",insertData);
-  //insertData:  {"data":[{"userName":"LC"},{"stateName":"Colorado"},{"stateRank":1},{"userName":"LC"},{"stateName":"Tennessee"},{"stateRank":2},{"userName":"LC"},{"stateName":"Texas"},{"stateRank":3}]}
-  
-    return new Promise( (resolve, reject) => {
-    fetch("/postData", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: insertData
-    })
-      .then(function(response) {
-        const r = response.json();
-        return r;
-      })
-      .then(function(myJson) {
-        $('#result').text(JSON.stringify(myJson));
-        return(myJson);
-      })
-      .catch(function(err) {
-        if (err) {
-          throw err;
-        }
-      });
-    });
-}
-
 function postAdjustment(){
-  var stateNames = $('#data_table').DataTable().columns(0).data().toArray()[0]; //push the first column of the html table into an array
+
+  let input = document.querySelectorAll(".form-control");
+  console.log("input: ",input)
+  console.log("inner text:", input[0].innerText)
+  console.log("value: ",input[0].lastElementChild.value)
+
   var postObject = {};
   var insertData = []; 
-  const name = $('#userName').val();
+  const name = "lclark"; //getUserName();
 
-  for(i=0;i<stateNames.length;i++){
-    const state = stateNames[i];
-    const index = i+1;
+  for(i=0;i<input.length;i++){
+    const salesperson = input[i].innerText.trim();
+    const adjustment = input[i].lastElementChild.value.trim();
+    //const index = i+1;
     insertData.push({userName:name});
-    insertData.push({stateName:state});
-    insertData.push({stateRank:index});
+    insertData.push({salesperson:salesperson});
+    insertData.push({adjustment:adjustment});
   }
 
   postObject.data = insertData;
+  console.log("postObject: ",postObject);
   postData(JSON.stringify(postObject));
+};
+
+postData = (insertData) => {
+  console.log("insertData: ",insertData);
+
+  return new Promise( (resolve, reject) => {
+  fetch("/postData", {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: insertData
+  })
+    .then(function(response) {
+      const r = response.json();
+      return r;
+    })
+    .then(function(myJson) {
+      $('#result').text(JSON.stringify(myJson));
+      return(myJson);
+    })
+    .catch(function(err) {
+      if (err) {
+        throw err;
+      }
+    });
+  });
+}
+
+function getUserName() {
+  usernamesheet = tableau.extensions.dashboardContent.dashboard.worksheets.find(w=>w.name==="currentUserSheet");
+  return usernamesheet.getSummaryDataAsync().then( (currentUserData) => {
+    return currentUserData.data[0][0].value;
+  });
 };
