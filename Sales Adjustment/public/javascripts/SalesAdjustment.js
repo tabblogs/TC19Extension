@@ -1,20 +1,24 @@
-//(function() 
-    //load tableau extension
+//(function() {
+  //load tableau extension
 
 let dashboardDataSources = {};
-var userName = "";
+var userName = "lclark";
+let worksheetName = "QuotaAttainment";
 
 tableau.extensions.initializeAsync().then(()=> {
-      loadSelectedMarks("QuotaAttainment");
+      loadSelectedMarks(worksheetName);
 
       dashboardDataSources = listDataSources();
       refreshDataSources(dashboardDataSources);
 
-      userName = getUserName();
+      // userName = getUserName().then(()=>{
+      //   console.log("userName: ",userName);
+      // })
   });
      
   // This variable will save off the function we can call to unregister listening to marks-selected events
   let unregisterEventHandlerFunction;
+
   function loadSelectedMarks (worksheetName) {
     // Remove any existing event listeners
     if (unregisterEventHandlerFunction) {
@@ -59,6 +63,8 @@ tableau.extensions.initializeAsync().then(()=> {
   };
 
   function populateDataTable (data, columns) {
+    $('#formPost').empty();
+
     if(data.length > 0) {
       $('#no_data_message').css('display', 'none');  
 

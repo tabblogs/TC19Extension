@@ -4,7 +4,7 @@ function postAdjustment(){
 
   var postObject = {};
   var insertData = []; 
-  const name = userName;
+  const name = "Tabblogs";
 
   for(i=0;i<input.length;i++){
     const salesperson = input[i].innerText.trim();
